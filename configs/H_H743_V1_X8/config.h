@@ -128,3 +128,5 @@
 #define PINIO2_CONFIG  129
 
 #define BEEPER_INVERTED
+
+#define USE_OSD
