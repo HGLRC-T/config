@@ -21,15 +21,10 @@
 
 #pragma once
 
-// GEETAC591_V1 -- GEETA STM32C591 FC. Silkscreen reads "C593" but the placed
-// part is an STM32C591RGT6 (LQFP64). C593 and C591 share an identical GPIO/USART
-// alternate-function map, so the C591 platform target applies unchanged.
-// Schematic: ~/src/ref/C591_2/STM32C593RGT6(0505).pdf
-
 #define FC_TARGET_MCU                   STM32C591
 
-#define BOARD_NAME                      GEETAC591_V1
-#define MANUFACTURER_ID                 GEET
+#define BOARD_NAME                      HGLRC_C593_S
+#define MANUFACTURER_ID                 HGLR
 
 // HSE 8 MHz crystal on PH0/PH1 (Y1)
 #define SYSTEM_HSE_MHZ                  8
@@ -43,27 +38,29 @@
 // --- USB VCP -------------------------------------------------------------
 // OTG FS on PA11 (D-) / PA12 (D+); USB VBUS sense on PC3.
 #define USE_VCP
-#define USB_DETECT_PIN                  PC3
-#define USE_USB_DETECT
 
 // --- Status LED ----------------------------------------------------------
-#define LED0_PIN                        PA0
+#define LED0_PIN                        PC0
+#define LED1_PIN                        PC5
 
 // --- UART pin map --------------------------------------------------------
-// UART7 is enabled in the STM32C591 target. UART1 TX (PA15), UART3 RX (PB1)
-// and UART7 TX (PA10) sit on pads added to the C5 serial driver pin tables.
-#define UART1_TX_PIN                    PA15
+#define UART1_TX_PIN                    PB6
 #define UART1_RX_PIN                    PB7
+
 #define UART2_TX_PIN                    PA2
 #define UART2_RX_PIN                    PA3
+
 #define UART3_TX_PIN                    PB10
-#define UART3_RX_PIN                    PB1
-#define UART4_TX_PIN                    PC10
-#define UART4_RX_PIN                    PC11
+#define UART3_RX_PIN                    PC4
+
+#define UART4_TX_PIN                    PA0
+#define UART4_RX_PIN                    PA1
+
 #define UART5_TX_PIN                    PC12
 #define UART5_RX_PIN                    PD2
-#define UART7_TX_PIN                    PA10
-#define UART7_RX_PIN                    PA8
+
+#define UART6_TX_PIN                    PC6
+#define UART6_RX_PIN                    PC7
 
 // --- IMU on SPI1 ---------------------------------------------------------
 // SPI1 SCK=PA5, MISO=PA6, MOSI=PA7 (AF5), CS=PA4, INT/DRDY=PC4.
@@ -86,24 +83,23 @@
 
 #define GYRO_1_SPI_INSTANCE             SPI1
 #define GYRO_1_CS_PIN                   PA4
-#define GYRO_1_EXTI_PIN                 PC4
-// LSM6 is mounted facing the board's rear, so rotate 180 deg about yaw.
-#define GYRO_1_ALIGN                    CW180_DEG
+#define GYRO_1_EXTI_PIN                 PB2
+#define GYRO_1_ALIGN                    CW0_DEG
 
 // --- External flash: W25Q256JV on SPI3 -----------------------------------
 // SPI3 SCK=PB3, MISO=PB4 (AF6), MOSI=PB5 (AF7 -- C5 quirk handled by the
 // platform pinconfig), CS=PB6. The W25Q256 (JEDEC 0xEF4019) is detected by
 // the generic m25p16 driver.
 #define USE_SPI_DEVICE_3
-#define SPI3_SCK_PIN                    PB3
-#define SPI3_SDI_PIN                    PB4
+#define SPI3_SCK_PIN                    PC10
+#define SPI3_SDI_PIN                    PC11
 #define SPI3_SDO_PIN                    PB5
 
 #define USE_FLASH
 #define USE_FLASH_M25P16
 #define USE_FLASH_W25Q128FV
 #define FLASH_SPI_INSTANCE              SPI3
-#define FLASH_CS_PIN                    PB6
+#define FLASH_CS_PIN                    PA15
 
 #define USE_FLASHFS
 #define USE_BLACKBOX
@@ -135,32 +131,33 @@
 
 #define USE_BARO
 #define USE_BARO_LPS22DF
+#define USE_BARO_DPS310
 #define BARO_I2C_INSTANCE               I2CDEV_1
 
 // --- Mag: external compass on I2C1 (GPS port) ----------------------------
 #define USE_MAG
 #define MAG_I2C_INSTANCE                I2CDEV_1
 
+// --- LED strip -----------------------------------------------------------
+#define USE_LED_STRIP
+#define LED_STRIP_PIN                   PA9
+
 // --- Motors: TIM8 --------------------------------------------------------
 // M1 PC6 / M2 PC7 / M3 PC8 / M4 PC9. On C591 each PCx pin appears in the
 // timer table for both TIM3 (occurrence 1) and TIM8 (occurrence 2); the
 // TIMER_PIN_MAP index is 1-based, so TIM8 is index 2. LED strip PA9
 // (TIM1_CH2) is index 1.
-#define MOTOR1_PIN                      PC6
-#define MOTOR2_PIN                      PC7
-#define MOTOR3_PIN                      PC8
-#define MOTOR4_PIN                      PC9
+#define MOTOR1_PIN                      PC9
+#define MOTOR2_PIN                      PC8
+#define MOTOR3_PIN                      PB0
+#define MOTOR4_PIN                      PB1
 
 #define TIMER_PIN_MAPPING \
-    TIMER_PIN_MAP(0, PC6, 2, -1) \
-    TIMER_PIN_MAP(1, PC7, 2, -1) \
-    TIMER_PIN_MAP(2, PC8, 2, -1) \
-    TIMER_PIN_MAP(3, PC9, 2, -1) \
-    TIMER_PIN_MAP(4, PA9, 1, -1)
-
-// --- LED strip -----------------------------------------------------------
-#define USE_LED_STRIP
-#define LED_STRIP_PIN                   PA9
+    TIMER_PIN_MAP(0, MOTOR1_PIN, 2, -1) \
+    TIMER_PIN_MAP(1, MOTOR2_PIN, 2, -1) \
+    TIMER_PIN_MAP(2, MOTOR3_PIN, 1, -1) \
+    TIMER_PIN_MAP(3, MOTOR4_PIN, 1, -1) \
+    TIMER_PIN_MAP(4, LED_STRIP_PIN, 1, -1)
 
 // --- ADC: VBAT + current -------------------------------------------------
 // PC2 = ADC channel 12 (VBAT divider), PC1 = ADC channel 11 (current sense).
@@ -176,25 +173,26 @@
 #define DEFAULT_VOLTAGE_METER_SOURCE    VOLTAGE_METER_ADC
 #define DEFAULT_CURRENT_METER_SOURCE    CURRENT_METER_ADC
 
+#define DEFAULT_BLACKBOX_DEVICE         BLACKBOX_DEVICE_FLASH
+
+#define ESC_SENSOR_UART      SERIAL_PORT_UART5
+#define GPS_UART             SERIAL_PORT_UART4
+
 // --- Buzzer --------------------------------------------------------------
 // Passive buzzer driven by PB2 via Q1 (MMBT3904 NPN low-side, base pulled to
 // GND) -- active high, idle-safe, so not inverted.
 #define USE_BEEPER
-#define BEEPER_PIN                      PB2
+#define BEEPER_PIN                      PC3
 
 // --- PINIO: VTX/O4 power switch + camera switch --------------------------
 // PC0 gates VTX/air-unit power; PC15 selects CAM1/CAM2 through the video mux.
 // Output push-pull, active high by default -- verify switch polarity on the
 // bench and flip the *_CONFIG value (to 129) if a rail is inverted.
-#define PINIO1_PIN                      PC0
-#define PINIO1_CONFIG                   1
-#define PINIO2_PIN                      PC15
-#define PINIO2_CONFIG                   1
+#define PINIO1_BOX           40
+#define PINIO1_PIN           PC15
+#define PINIO1_CONFIG        129
+#define BOX_USER1_NAME       "12V BEC"
 
-// --- Deferred ------------------------------------------------------------
-// Analog camera control: PA1 (TIM2_CH2). The camera-control PWM backend
-// (camera_control_stm32.c) is not yet compiled for the STM32C5 platform, so
-// the feature is left off until that support lands.
-// CAN/DroneCAN: FDCAN1 on PC13 (TX) / PC14 (RX), SIT1051 silent on PE2.
-// Gyro CLKIN: PB0 (TIM3_CH3) routes an external clock to the IMU.
-// None of these are enabled in this first bring-up config.
+#define PINIO2_BOX           41
+#define PINIO2_PIN           PC14
+#define BOX_USER2_NAME       "Cam1,2"
