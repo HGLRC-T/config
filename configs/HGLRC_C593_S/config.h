@@ -56,19 +56,16 @@
 #define UART4_TX_PIN                    PA0
 #define UART4_RX_PIN                    PA1
 
-#define UART5_TX_PIN                    PC12
 #define UART5_RX_PIN                    PD2
 
+#define USE_UART6
 #define UART6_TX_PIN                    PC6
 #define UART6_RX_PIN                    PC7
 
 // --- IMU on SPI1 ---------------------------------------------------------
-// SPI1 SCK=PA5, MISO=PA6, MOSI=PA7 (AF5), CS=PA4, INT/DRDY=PC4.
-// The board footprints an LSM6DSK320X (placed) alongside unpopulated
-// ICM-42688P and MPU-6000 sites. Both the LSM6 and ICM-42688P drivers are
-// compiled in (default in common_pre.h) so detection picks the part actually
-// present by WHO_AM_I -- the sister C5 board silkscreened ICM but carried LSM6
-// silicon, so do not assume the marking.
+// SPI1 SCK=PA5, MISO=PA6, MOSI=PA7, CS=PA4, INT/DRDY=PB2.
+// U3 is populated with ICM-42688-P. An LSM6DSK320X may be fitted as an
+// assembly alternative, but is not populated on this board revision.
 #define USE_ACC
 #define USE_GYRO
 #define USE_GYRO_EXTI
@@ -86,10 +83,9 @@
 #define GYRO_1_EXTI_PIN                 PB2
 #define GYRO_1_ALIGN                    CW0_DEG
 
-// --- External flash: W25Q256JV on SPI3 -----------------------------------
-// SPI3 SCK=PB3, MISO=PB4 (AF6), MOSI=PB5 (AF7 -- C5 quirk handled by the
-// platform pinconfig), CS=PB6. The W25Q256 (JEDEC 0xEF4019) is detected by
-// the generic m25p16 driver.
+// --- External flash: ZB25VQ128DWJG on SPI3 -------------------------------
+// SPI3 SCK=PC10, MISO=PC11, MOSI=PC12, CS=PA15. PC12 is shared with the
+// USART5 TX alternate function, but is wired only to flash on this board.
 #define USE_SPI_DEVICE_3
 #define SPI3_SCK_PIN                    PC10
 #define SPI3_SDI_PIN                    PC11
@@ -120,17 +116,14 @@
 // auto-select USE_OSD_HD and short-circuit init.c onto the MSP OSD path.
 #define USE_OSD_SD
 
-// --- Baro: LPS22DF on I2C1 -----------------------------------------------
-// I2C1 SCL=PB8, SDA=PB9 (AF4) -- real hardware I2C1 (not I3C-as-I2C). The
-// LPS22DF driver fixes the bus address to 0x5D. The same I2C1 bus carries the
-// external compass on the GPS connector.
+// --- Baro: SPA06-003 (DPS310-compatible) on I2C1 -------------------------
+// I2C1 SCL=PB8 and SDA=PB9. The same bus is exposed on the GPS connector.
 #define USE_I2C
 #define USE_I2C_DEVICE_1
 #define I2C1_SCL_PIN                    PB8
 #define I2C1_SDA_PIN                    PB9
 
 #define USE_BARO
-#define USE_BARO_LPS22DF
 #define USE_BARO_DPS310
 #define BARO_I2C_INSTANCE               I2CDEV_1
 
@@ -140,13 +133,12 @@
 
 // --- LED strip -----------------------------------------------------------
 #define USE_LED_STRIP
-#define LED_STRIP_PIN                   PA9
+#define LED_STRIP_PIN                   PB3
 
-// --- Motors: TIM8 --------------------------------------------------------
-// M1 PC6 / M2 PC7 / M3 PC8 / M4 PC9. On C591 each PCx pin appears in the
-// timer table for both TIM3 (occurrence 1) and TIM8 (occurrence 2); the
-// TIMER_PIN_MAP index is 1-based, so TIM8 is index 2. LED strip PA9
-// (TIM1_CH2) is index 1.
+// --- Motors ---------------------------------------------------------------
+// M1=PC9, M2=PC8, M3=PB0, M4=PB1. The remaining four outputs are routed to
+// PA10, PA9, PA8, and PB4, but are not enabled until their C591 timer map is
+// verified on hardware.
 #define MOTOR1_PIN                      PC9
 #define MOTOR2_PIN                      PC8
 #define MOTOR3_PIN                      PB0
@@ -179,13 +171,13 @@
 #define GPS_UART             SERIAL_PORT_UART4
 
 // --- Buzzer --------------------------------------------------------------
-// Passive buzzer driven by PB2 via Q1 (MMBT3904 NPN low-side, base pulled to
+// Passive buzzer driven by PC3 via Q1 (MMBT3904 NPN low-side, base pulled to
 // GND) -- active high, idle-safe, so not inverted.
 #define USE_BEEPER
 #define BEEPER_PIN                      PC3
 
 // --- PINIO: VTX/O4 power switch + camera switch --------------------------
-// PC0 gates VTX/air-unit power; PC15 selects CAM1/CAM2 through the video mux.
+// PC15 gates the 12 V BEC; PC14 selects CAM1/CAM2 through the video mux.
 // Output push-pull, active high by default -- verify switch polarity on the
 // bench and flip the *_CONFIG value (to 129) if a rail is inverted.
 #define PINIO1_BOX           40
